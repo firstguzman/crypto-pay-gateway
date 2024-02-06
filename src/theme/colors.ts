@@ -10,6 +10,7 @@ const palette: Record<string, string> = {
   primaryBrilliant: 'rgba(4, 101, 221, 1)',
 
   secondaryDarker: 'rgba(21, 187, 224, 1)',
+  secondaryLighter: 'rgba(198, 223, 254, 1)',
 
   accentYellow: 'rgba(234, 179, 8, 1)',
   accentGreen: 'rgba(22, 163, 74, 1)',
@@ -40,4 +41,6 @@ export const colors = {
   warning: palette.accentYellow,
 
   success: palette.accentGreen,
+
+  disabled: palette.secondaryLighter,
 }
