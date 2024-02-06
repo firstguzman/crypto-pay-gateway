@@ -4,7 +4,7 @@ import { Screen } from '../components'
 
 export const OrderSummaryScreen: FC<any> = () => {
   return (
-    <Screen preset="fixed" safeAreaEdges={['top', 'bottom']}>
+    <Screen preset="fixed" safeAreaEdges={['bottom']}>
       <Text>Open up App.tsx to start working on your app!</Text>
     </Screen>
   )

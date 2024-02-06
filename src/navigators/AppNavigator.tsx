@@ -9,6 +9,7 @@ import {
 } from '@react-navigation/native-stack'
 import React from 'react'
 import { useColorScheme } from 'react-native'
+import { Text } from '../components'
 import Config from '../config'
 import * as Screens from '../screens'
 import { colors } from '../theme'
@@ -34,16 +35,18 @@ const AppStack = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
         navigationBarColor: colors.background,
+        headerTitle: (props) => <Text preset="h4">{props.children}</Text>,
       }}
     >
       <Stack.Screen
         name="CreatePayment"
+        options={{ title: 'Crear Pago' }}
         component={Screens.CreatePaymentScreen}
       />
       <Stack.Screen
         name="OrderSummary"
+        options={{ title: 'Resumen del pedido' }}
         component={Screens.OrderSummaryScreen}
       />
     </Stack.Navigator>
