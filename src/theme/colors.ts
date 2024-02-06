@@ -5,7 +5,7 @@ const palette: Record<string, string> = {
   neutral5: 'rgba(192, 204, 218, 1)',
   neutralBlack: 'rgba(0, 0, 0, 1)',
 
-  primaryDarker: 'rgba(3, 90, 197, 1)',
+  primaryDarker: 'rgba(0, 40, 89, 1)',
   primaryLighter: 'rgba(3, 90, 197, 1)',
   primaryBrilliant: 'rgba(4, 101, 221, 1)',
 
@@ -30,7 +30,7 @@ export const colors = {
 
   background: palette.neutralWhite,
 
-  backgroundPrimary: palette.primaryDarker,
+  backgroundPrimary: palette.primaryLighter,
 
   border: palette.neutral5,
 
