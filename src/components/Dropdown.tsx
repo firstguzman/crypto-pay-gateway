@@ -1,13 +1,17 @@
 import React, { SetStateAction, useState } from 'react'
 import {
+  Image,
   StyleProp,
   TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native'
-import DropDownPicker from 'react-native-dropdown-picker'
+import DropDownPicker, {
+  RenderListItemPropsInterface,
+} from 'react-native-dropdown-picker'
 import { colors, spacing, typography } from '../theme'
+import { Currencies } from '../types/currencies'
 import { Icon } from './Icon'
 import { Text, TextProps } from './Text'
 
@@ -46,6 +50,10 @@ export interface DropdownProps {
    * The placeholder text to display in search abr.
    */
   searchPlaceholder?: TextProps['text']
+  /**
+   * State to input disable or not
+   */
+  disabled?: boolean
 }
 
 export function Dropdown(props: DropdownProps) {
@@ -55,6 +63,7 @@ export function Dropdown(props: DropdownProps) {
     label,
     placeholder,
     searchPlaceholder,
+    disabled,
     LabelTextProps,
     onValueChange,
     dropdownWrapperStyle: $dropdownWrapperStyleOverride,
@@ -79,6 +88,7 @@ export function Dropdown(props: DropdownProps) {
 
       <DropDownPicker
         searchable
+        disabled={disabled}
         modalAnimationType="slide"
         CloseIconComponent={() => <Icon icon="close" />}
         ArrowDownIconComponent={() => <Icon icon="arrowDown" />}
@@ -98,25 +108,35 @@ export function Dropdown(props: DropdownProps) {
         searchPlaceholder={searchPlaceholder}
         searchPlaceholderTextColor={colors.textDim}
         closeAfterSelecting={true}
-        renderListItem={({ label, isSelected, item, onPress }) => {
+        renderListItem={(props: RenderListItemPropsInterface<Currencies>) => {
           return (
             <TouchableOpacity
               style={{
                 paddingVertical: spacing.xs,
-                paddingHorizontal: spacing.xxs,
+                paddingHorizontal: spacing.sm,
                 flexDirection: 'row',
                 gap: spacing.sm,
+                alignItems: 'center',
               }}
-              onPress={() => onPress(item)}
+              onPress={() => props.onPress(props.item)}
             >
-              <View></View>
               <View>
+                <Image
+                  source={{ uri: props.item.imageURL }}
+                  style={{ width: 36, height: 36 }}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
                 <Text preset="body" weight="bold">
                   {label}
                 </Text>
-                <Text preset="small">{label}</Text>
+                <Text preset="small">{props.item.symbol}</Text>
               </View>
-              <View></View>
+              {props.isSelected ? (
+                <Icon icon="tickCircle" />
+              ) : (
+                <Icon icon="arrowRight" />
+              )}
             </TouchableOpacity>
           )
         }}

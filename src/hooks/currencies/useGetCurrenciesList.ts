@@ -3,11 +3,12 @@ import { CurrenciesAPI, fetchCurrencies } from '../../api/currencies'
 import { Currencies } from '../../types/currencies'
 
 function parseCurrenciesAPI(currenciesList: CurrenciesAPI[]): Currencies[] {
-  return currenciesList.map((currency) => ({
+  return currenciesList.map((currency, index) => ({
     ...currency,
     minAmount: currency.min_amount,
     maxAmount: currency.max_amount,
     imageURL: currency.image,
+    id: index + 1,
   }))
 }
 

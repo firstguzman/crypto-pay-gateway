@@ -1,8 +1,9 @@
 import { StackActions } from '@react-navigation/native'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { ViewStyle } from 'react-native'
 import { Button, Dropdown, Screen, TextField } from '../components'
 
+import { useGetCurrenciesList } from '../hooks/currencies/useGetCurrenciesList'
 import { AppStackScreenProps } from '../navigators'
 import { spacing } from '../theme'
 
@@ -12,14 +13,25 @@ interface CreatePaymentScreenProps
 export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
   navigation,
 }) => {
-  const [amount, setAmount] = useState<string>()
-  const [notes, setNotes] = useState<string>()
-  const [currency, setCurrency] = useState<string>()
+  const [items, setItems] = useState<any[]>([])
 
-  const [items, setItems] = useState([
-    { label: 'Apple', value: 'apple' },
-    { label: 'Banana', value: 'banana' },
-  ])
+  const [amount, setAmount] = useState<string>()
+  const [currency, setCurrency] = useState<string>()
+  const [notes, setNotes] = useState<string>()
+
+  const { data, isLoading: isFetchingCurrencies } = useGetCurrenciesList()
+
+  useEffect(() => {
+    if (data.length) {
+      setItems(
+        data.map((element) => ({
+          label: element.name,
+          value: element.id,
+          ...element,
+        })),
+      )
+    }
+  }, [data])
 
   const onSuccessAction = () => {
     navigation.dispatch(StackActions.replace('OrderSummary'))
@@ -48,6 +60,7 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
         placeholder={'Selecciona una moneda'}
         searchPlaceholder={'Buscar'}
         dropdownWrapperStyle={$textField}
+        disabled={isFetchingCurrencies}
       />
 
       <TextField
