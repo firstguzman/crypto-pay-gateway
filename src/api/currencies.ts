@@ -2,12 +2,12 @@ import Config from '../config'
 import { http } from '../http'
 
 export interface CurrenciesAPI {
-  symbol: 'string'
-  name: 'string'
-  min_amount: 'string'
-  max_amount: 'string'
-  image: 'string'
-  blockchain: 'string'
+  symbol: string
+  name: string
+  min_amount: string
+  max_amount: string
+  image: string
+  blockchain: string
 }
 
 export function handleErrorMessage(code: number) {
