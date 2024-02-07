@@ -104,7 +104,7 @@ const $presets = {
   h6: [
     $baseStyle,
     $sizeStyles.sm,
-    $fontWeightStyles.semiBold,
+    $fontWeightStyles.normal,
   ] as StyleProp<TextStyle>,
 
   body: [

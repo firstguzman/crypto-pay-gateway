@@ -71,6 +71,7 @@ export function Button(props: ButtonProps) {
           text={text}
           preset="h6"
           style={{ color: colors.texOnBackgroundPrimary }}
+          weight="bold"
         >
           {children}
         </Text>
