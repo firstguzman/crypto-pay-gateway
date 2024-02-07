@@ -1,21 +1,18 @@
-import React, { SetStateAction, useState } from 'react'
+import React, { SetStateAction, useEffect, useState } from 'react'
 import {
+  FlatList,
   Image,
+  Modal,
   StyleProp,
-  TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native'
-import DropDownPicker, {
-  RenderListItemPropsInterface,
-} from 'react-native-dropdown-picker'
-import { colors, spacing, typography } from '../theme'
-import { Currencies } from '../types/currencies'
+import { spacing } from '../theme'
 import { Icon } from './Icon'
+import { Screen } from './Screen'
 import { Text, TextProps } from './Text'
-
-DropDownPicker.setListMode('MODAL')
+import { TextField } from './TextField'
 
 export interface DropdownProps {
   /**
@@ -23,33 +20,30 @@ export interface DropdownProps {
    */
   value: any
   /**
-   * Function to be executed to change selected value.
+   * Style overrides for the container
    */
-  onValueChange: (callback: SetStateAction<any>) => void
-  /**
-   * Variable that holds the items.
-   */
-  items: any[]
+  containerStyle?: StyleProp<ViewStyle>
   /**
    * The label text to display.
    */
   label?: TextProps['text']
   /**
-   * Pass any additional props directly to the label Text component.
+   * The label text to display.
    */
-  LabelTextProps?: TextProps
-  /**
-   * Style overrides for the dropdown container
-   */
-  dropdownWrapperStyle?: StyleProp<ViewStyle>
-  /**
-   * The placeholder text to display.
-   */
-  placeholder?: TextProps['text']
+  searchModalTitle?: TextProps['text']
   /**
    * The placeholder text to display in search abr.
    */
   searchPlaceholder?: TextProps['text']
+  /**
+   * Variable that holds the items.
+   */
+  items: any[]
+  /**
+   * Function to be executed to change selected value.
+   */
+  onValueChange: (callback: SetStateAction<any>) => void
+
   /**
    * State to input disable or not
    */
@@ -59,131 +53,125 @@ export interface DropdownProps {
 export function Dropdown(props: DropdownProps) {
   const {
     value,
-    items,
+    containerStyle,
     label,
-    placeholder,
+    searchModalTitle,
     searchPlaceholder,
+    items,
+
     disabled,
-    LabelTextProps,
+
     onValueChange,
-    dropdownWrapperStyle: $dropdownWrapperStyleOverride,
   } = props
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
+  const [search, setSearch] = useState<string>('')
+  const [filteredValues, setFilteredValues] = useState<any>(items)
 
-  const $labelStyles = [$labelStyle, LabelTextProps?.style]
+  useEffect(() => {
+    setFilteredValues(items)
+  }, [items])
 
-  const $dropdownWrapperStyles = [
-    $dropdownWrapperStyle,
-    $dropdownWrapperStyleOverride,
-  ]
+  useEffect(() => {
+    setFilteredValues(items.filter((element) => element.name.includes(search)))
+  }, [search])
 
   return (
     <>
-      {!!label && (
-        <View style={$labelStyles}>
-          <Text preset="body" weight="bold" text={label} {...LabelTextProps} />
-          <Icon icon="infoCircle" />
-        </View>
-      )}
-
-      <DropDownPicker
-        searchable
-        disabled={disabled}
-        modalAnimationType="slide"
-        CloseIconComponent={() => <Icon icon="close" />}
-        ArrowDownIconComponent={() => <Icon icon="arrowDown" />}
-        ArrowUpIconComponent={() => <></>}
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={onValueChange}
-        style={$dropdownWrapperStyles}
-        dropDownContainerStyle={$dropdownWrapperStyles}
-        placeholder={placeholder}
-        placeholderStyle={{ color: colors.textDim }}
-        textStyle={$inputStyle}
-        searchContainerStyle={{ borderBottomWidth: 0 }}
-        searchTextInputStyle={$searchInputStyle}
-        searchPlaceholder={searchPlaceholder}
-        searchPlaceholderTextColor={colors.textDim}
-        closeAfterSelecting={true}
-        renderListItem={(props: RenderListItemPropsInterface<Currencies>) => {
-          return (
-            <TouchableOpacity
-              style={{
-                paddingVertical: spacing.xs,
-                paddingHorizontal: spacing.sm,
-                flexDirection: 'row',
-                gap: spacing.sm,
-                alignItems: 'center',
-              }}
-              onPress={() => props.onPress(props.item)}
-            >
-              <View>
-                <Image
-                  source={{ uri: props.item.imageURL }}
-                  style={{ width: 36, height: 36 }}
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text preset="body" weight="bold">
-                  {label}
-                </Text>
-                <Text preset="small">{props.item.symbol}</Text>
-              </View>
-              {props.isSelected ? (
-                <Icon icon="tickCircle" />
-              ) : (
-                <Icon icon="arrowRight" />
-              )}
-            </TouchableOpacity>
-          )
-        }}
+      <TextField
+        infoIndicator
+        value={value?.name}
+        label={label}
+        containerStyle={containerStyle}
+        RightAccessory={(props) => (
+          <Icon icon="arrowDown" containerStyle={props.style} />
+        )}
+        LeftAccessory={(props) => (
+          <Image
+            source={{ uri: value?.imageURL }}
+            style={[props.style, { aspectRatio: 1 }]}
+          />
+        )}
+        onPress={() => setOpen(true)}
       />
+      <Modal visible={open} animationType="slide">
+        <Screen
+          safeAreaEdges={['top', 'bottom']}
+          contentContainerStyle={$modalContainer}
+        >
+          <View style={$headerStyle}>
+            <Text preset="h5" weight="bold" text={searchModalTitle} />
+            <Icon icon="close" onPress={() => setOpen(false)} />
+          </View>
+          <TextField
+            value={search}
+            onChangeText={setSearch}
+            placeholder={searchPlaceholder}
+            LeftAccessory={(props) => (
+              <Icon icon="search" containerStyle={props.style} />
+            )}
+            onPressIn={() => setOpen(true)}
+          />
+          <FlatList
+            data={filteredValues}
+            keyExtractor={(item) => String(item.id)}
+            contentContainerStyle={{ marginTop: spacing.md }}
+            renderItem={({ item }) => {
+              const isSelected = value.id === item.id
+
+              return (
+                <TouchableOpacity
+                  style={$itemContainer}
+                  onPress={() => {
+                    onValueChange(item)
+                    setOpen(false)
+                  }}
+                >
+                  <View>
+                    <Image
+                      source={{ uri: item.imageURL }}
+                      style={{ width: 36, height: 36 }}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text preset="body" weight="bold">
+                      {item.name}
+                    </Text>
+                    <Text preset="small">{item.symbol}</Text>
+                  </View>
+                  {isSelected ? (
+                    <Icon icon="tickCircle" />
+                  ) : (
+                    <Icon icon="arrowRight" />
+                  )}
+                </TouchableOpacity>
+              )
+            }}
+            ListEmptyComponent={() => (
+              <Text
+                preset="body"
+                weight="bold"
+                text="Sin resultados encontrados"
+                style={{ textAlign: 'center' }}
+              />
+            )}
+          />
+        </Screen>
+      </Modal>
     </>
   )
 }
 
-const $labelStyle: TextStyle = {
-  marginBottom: spacing.xxs,
+const $modalContainer: ViewStyle = { padding: spacing.md, flex: 1 }
+
+const $headerStyle: ViewStyle = {
+  justifyContent: 'space-between',
   flexDirection: 'row',
+  marginBottom: spacing.md,
+}
+
+const $itemContainer: ViewStyle = {
+  paddingVertical: spacing.xs,
+  flexDirection: 'row',
+  gap: spacing.sm,
   alignItems: 'center',
-  gap: spacing.xxs,
-}
-
-const $dropdownWrapperStyle: ViewStyle = {
-  borderWidth: 1,
-  borderRadius: 6,
-  backgroundColor: colors.background,
-  borderColor: colors.border,
-  minHeight: 0,
-}
-
-const $inputStyle: TextStyle = {
-  flex: 1,
-  alignSelf: 'stretch',
-  fontFamily: typography.primary.normal,
-  color: colors.text,
-  fontSize: 16,
-  height: 24,
-  paddingVertical: 0,
-  paddingHorizontal: 0,
-  marginVertical: spacing.xs,
-}
-
-const $searchInputStyle: TextStyle = {
-  fontFamily: typography.primary.normal,
-  color: colors.textDim,
-  fontSize: 14,
-  flexDirection: 'row',
-  alignItems: 'flex-start',
-  borderWidth: 1,
-  borderRadius: 6,
-  height: 'auto',
-  backgroundColor: colors.background,
-  borderColor: colors.border,
-  overflow: 'hidden',
-  marginVertical: 0,
-  marginBottom: 0,
 }
