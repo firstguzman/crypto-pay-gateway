@@ -10,6 +10,8 @@ import DropDownPicker from 'react-native-dropdown-picker'
 import { colors, spacing, typography } from '../theme'
 import { Text, TextProps } from './Text'
 
+DropDownPicker.setListMode('MODAL')
+
 export interface DropdownProps {
   /**
    * Specifies the value of the selected item.
@@ -78,6 +80,7 @@ export function Dropdown(props: DropdownProps) {
 
       <DropDownPicker
         searchable
+        modalAnimationType="slide"
         open={open}
         value={value}
         items={items}
