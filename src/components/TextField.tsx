@@ -1,4 +1,10 @@
-import React, { forwardRef, Ref, useImperativeHandle, useRef } from 'react'
+import React, {
+  ComponentType,
+  forwardRef,
+  Ref,
+  useImperativeHandle,
+  useRef,
+} from 'react'
 import {
   StyleProp,
   TextInput,
@@ -9,6 +15,7 @@ import {
   ViewStyle,
 } from 'react-native'
 import { colors, spacing, typography } from '../theme'
+import { Icon } from './Icon'
 import { Text, TextProps } from './Text'
 
 export interface TextFieldAccessoryProps {
@@ -44,6 +51,10 @@ export interface TextFieldProps extends Omit<TextInputProps, 'ref'> {
    */
   placeholder?: TextProps['text']
   /**
+   * To show info icon in the label.
+   */
+  infoIndicator?: boolean
+  /**
    * Optional input style override.
    */
   style?: StyleProp<TextStyle>
@@ -55,6 +66,22 @@ export interface TextFieldProps extends Omit<TextInputProps, 'ref'> {
    * Style overrides for the input wrapper
    */
   inputWrapperStyle?: StyleProp<ViewStyle>
+  /**
+   * An optional component to render on the right side of the input.
+   * Example: `RightAccessory={(props) => <Icon icon="ladybug" containerStyle={props.style} color={props.editable ? colors.textDim : colors.text} />}`
+   * Note: It is a good idea to memoize this.
+   */
+  RightAccessory?: ComponentType<TextFieldAccessoryProps>
+  /**
+   * An optional component to render on the left side of the input.
+   * Example: `LeftAccessory={(props) => <Icon icon="ladybug" containerStyle={props.style} color={props.editable ? colors.textDim : colors.text} />}`
+   * Note: It is a good idea to memoize this.
+   */
+  LeftAccessory?: ComponentType<TextFieldAccessoryProps>
+  /**
+   * To execute an action when field if touched
+   */
+  onPress?: () => void
 }
 
 export const TextField = forwardRef(function TextField(
@@ -66,11 +93,15 @@ export const TextField = forwardRef(function TextField(
     placeholder,
     helper,
     status,
+    infoIndicator,
+    RightAccessory,
+    LeftAccessory,
     HelperTextProps,
     LabelTextProps,
     style: $inputStyleOverride,
     containerStyle: $containerStyleOverride,
     inputWrapperStyle: $inputWrapperStyleOverride,
+    onPress,
     ...TextInputProps
   } = props
   const input = useRef<TextInput>(null)
@@ -87,6 +118,8 @@ export const TextField = forwardRef(function TextField(
     $inputWrapperStyle,
     status === 'error' && { borderColor: colors.error },
     TextInputProps.multiline && { minHeight: 112 },
+    LeftAccessory && { paddingStart: 0 },
+    RightAccessory && { paddingEnd: 0 },
     $inputWrapperStyleOverride,
   ]
 
@@ -106,7 +139,11 @@ export const TextField = forwardRef(function TextField(
   function focusInput() {
     if (disabled) return
 
-    input.current?.focus()
+    if (onPress) {
+      onPress()
+    } else {
+      input.current?.focus()
+    }
   }
 
   useImperativeHandle(ref, () => input.current as TextInput)
@@ -119,15 +156,22 @@ export const TextField = forwardRef(function TextField(
       accessibilityState={{ disabled }}
     >
       {!!label && (
-        <Text
-          preset="body"
-          text={label}
-          {...LabelTextProps}
-          style={$labelStyles}
-        />
+        <View style={$labelStyles}>
+          <Text preset="body" weight="bold" text={label} {...LabelTextProps} />
+          {!!infoIndicator && <Icon icon="infoCircle" />}
+        </View>
       )}
 
       <View style={$inputWrapperStyles}>
+        {!!LeftAccessory && (
+          <LeftAccessory
+            style={$leftAccessoryStyle}
+            status={status}
+            editable={!disabled}
+            multiline={TextInputProps.multiline ?? false}
+          />
+        )}
+
         <TextInput
           ref={input}
           underlineColorAndroid={colors.transparent}
@@ -137,7 +181,17 @@ export const TextField = forwardRef(function TextField(
           {...TextInputProps}
           editable={!disabled}
           style={$inputStyles}
+          onPressIn={focusInput}
         />
+
+        {!!RightAccessory && (
+          <RightAccessory
+            style={$rightAccessoryStyle}
+            status={status}
+            editable={!disabled}
+            multiline={TextInputProps.multiline ?? false}
+          />
+        )}
       </View>
 
       {!!helper && (
@@ -154,7 +208,9 @@ export const TextField = forwardRef(function TextField(
 
 const $labelStyle: TextStyle = {
   marginBottom: spacing.xxs,
-  fontFamily: typography.primary.bold,
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: spacing.xxs,
 }
 
 const $inputWrapperStyle: ViewStyle = {
@@ -183,4 +239,18 @@ const $inputStyle: TextStyle = {
 
 const $helperStyle: TextStyle = {
   marginTop: spacing.xxs,
+}
+
+const $rightAccessoryStyle: ViewStyle = {
+  marginEnd: spacing.xs,
+  height: 40,
+  justifyContent: 'center',
+  alignItems: 'center',
+}
+
+const $leftAccessoryStyle: ViewStyle = {
+  marginStart: spacing.xs,
+  height: 40,
+  justifyContent: 'center',
+  alignItems: 'center',
 }
