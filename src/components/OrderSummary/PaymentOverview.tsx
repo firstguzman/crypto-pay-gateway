@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import { View, ViewStyle } from 'react-native'
 import { colors, spacing } from '../../theme'
+import { Icon } from '../Icon'
 import { Screen } from '../Screen'
 import { Text } from '../Text'
 
@@ -58,9 +59,17 @@ export const PaymentOverview: FC<any> = () => {
       <Separator />
 
       <Item label="Comercio:">
-        <Text preset={'h6'} style={{ maxWidth: '50%' }}>
-          Comercio de pruebas de Semega
-        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            gap: spacing.xxs,
+            maxWidth: '65%',
+            overflow: 'hidden',
+          }}
+        >
+          <Icon icon="verify" />
+          <Text preset={'h6'}>Comercio de pruebas de Semega</Text>
+        </View>
       </Item>
 
       <Item label="Fecha:">

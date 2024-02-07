@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 import DropDownPicker from 'react-native-dropdown-picker'
 import { colors, spacing, typography } from '../theme'
+import { Icon } from './Icon'
 import { Text, TextProps } from './Text'
 
 DropDownPicker.setListMode('MODAL')
@@ -70,17 +71,18 @@ export function Dropdown(props: DropdownProps) {
   return (
     <>
       {!!label && (
-        <Text
-          preset="body"
-          text={label}
-          {...LabelTextProps}
-          style={$labelStyles}
-        />
+        <View style={$labelStyles}>
+          <Text preset="body" weight="bold" text={label} {...LabelTextProps} />
+          <Icon icon="infoCircle" />
+        </View>
       )}
 
       <DropDownPicker
         searchable
         modalAnimationType="slide"
+        CloseIconComponent={() => <Icon icon="close" />}
+        ArrowDownIconComponent={() => <Icon icon="arrowDown" />}
+        ArrowUpIconComponent={() => <></>}
         open={open}
         value={value}
         items={items}
@@ -125,7 +127,9 @@ export function Dropdown(props: DropdownProps) {
 
 const $labelStyle: TextStyle = {
   marginBottom: spacing.xxs,
-  fontFamily: typography.primary.bold,
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: spacing.xxs,
 }
 
 const $dropdownWrapperStyle: ViewStyle = {

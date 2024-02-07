@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react'
 import { View, ViewStyle } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { colors, spacing } from '../../theme'
+import { Icon } from '../Icon'
 import { Screen } from '../Screen'
 import { Text } from '../Text'
 
@@ -13,7 +14,16 @@ export const Checkout: FC<any> = () => {
       safeAreaEdges={['bottom']}
       contentContainerStyle={$container}
     >
-      <View style={{ alignItems: 'center', marginBottom: spacing.xl }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: spacing.xl,
+          justifyContent: 'center',
+          gap: spacing.xxs,
+        }}
+      >
+        <Icon icon="timer" />
         <Text preset="small" weight="semiBold">
           05:08
         </Text>
@@ -28,7 +38,6 @@ export const Checkout: FC<any> = () => {
           alignSelf: 'center',
           marginBottom: spacing.xl,
           justifyContent: 'center',
-          marginHorizontal: '15%',
           padding: spacing.lg,
           shadowColor: '#000000',
           shadowOffset: {
@@ -53,22 +62,46 @@ export const Checkout: FC<any> = () => {
           marginBottom: spacing.xl,
         }}
       >
-        <View style={{ flexDirection: 'row', marginBottom: spacing.sm }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginBottom: spacing.sm,
+            alignItems: 'center',
+            gap: spacing.xs,
+          }}
+        >
           <Text preset="h4" weight="semiBold">
             Enviar{' '}
             <Text preset="h4" weight="bold">
               108,02 XRP
             </Text>
           </Text>
+          <Icon icon="copy" />
         </View>
 
-        <View style={{ flexDirection: 'row', marginBottom: spacing.sm }}>
-          <Text preset="body" style={{ textAlign: 'center' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginBottom: spacing.sm,
+            alignItems: 'center',
+            gap: spacing.xs,
+          }}
+        >
+          <Text preset="body" style={{ textAlign: 'center', maxWidth: '80%' }}>
             Xp4Lw2PtQgB7RmedTak143LrXp4Lw2PtQgB7RmedEV731CdTak143LrXp4L
           </Text>
+          <Icon icon="copy" />
         </View>
 
-        <View style={{ flexDirection: 'row', marginBottom: spacing.sm }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginBottom: spacing.sm,
+            alignItems: 'center',
+            gap: spacing.xs,
+          }}
+        >
+          <Icon icon="warning" />
           <Text
             preset="small"
             weight="semiBold"
@@ -76,6 +109,7 @@ export const Checkout: FC<any> = () => {
           >
             Etiqueta de destino: 25571 64061
           </Text>
+          <Icon icon="copy" />
         </View>
       </View>
     </Screen>
