@@ -1,5 +1,5 @@
 const palette: Record<string, string> = {
-  neutralWhite: 'rgba(245, 245, 245, 1)',
+  neutralWhite: 'rgba(255, 255, 255, 1)',
   neutral3: 'rgba(229, 233, 242, 1)',
   neutral4: 'rgba(100, 113, 132, 1)',
   neutral5: 'rgba(192, 204, 218, 1)',
