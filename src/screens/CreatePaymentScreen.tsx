@@ -1,11 +1,13 @@
-import { StackActions } from '@react-navigation/native'
 import { FC, useEffect, useState } from 'react'
 import { ViewStyle } from 'react-native'
 import { Button, Dropdown, Screen, TextField } from '../components'
 
+import { StackActions } from '@react-navigation/native'
 import { useGetCurrenciesList } from '../hooks/currencies/useGetCurrenciesList'
+import { useCreateOrder } from '../hooks/orders.ts/useCreateOrder'
 import { AppStackScreenProps } from '../navigators'
 import { spacing } from '../theme'
+import { Currencies } from '../types/currencies'
 
 interface CreatePaymentScreenProps
   extends AppStackScreenProps<'CreatePayment'> {}
@@ -13,54 +15,83 @@ interface CreatePaymentScreenProps
 export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
   navigation,
 }) => {
-  const [items, setItems] = useState<any[]>([])
-
   const [amount, setAmount] = useState<string>()
-  const [currency, setCurrency] = useState<string>()
-  const [notes, setNotes] = useState<string>()
+  const [currency, setCurrency] = useState<Currencies>()
+  const [notes, setNotes] = useState<string>('')
+
+  const [amountError, setAmountError] = useState<string>('')
 
   const { data, isLoading: isFetchingCurrencies } = useGetCurrenciesList()
+  const { createOrder, isLoading, error } = useCreateOrder()
 
   useEffect(() => {
     if (data.length) {
-      setItems(
-        data.map((element) => ({
-          label: element.name,
-          value: element.id,
-          ...element,
-        })),
-      )
+      setCurrency(data[0])
     }
   }, [data])
 
-  const onSuccessAction = () => {
-    navigation.dispatch(StackActions.replace('OrderSummary'))
+  const checkCurrencyLimits = () => {
+    if (currency === undefined) return
+
+    const floatAmount = parseFloat(amount as string)
+
+    return (
+      parseFloat(currency.minAmount) <= floatAmount &&
+      floatAmount <= parseFloat(currency.maxAmount)
+    )
+  }
+
+  const create = async () => {
+    if (currency === undefined) return
+    const isAmountValid = checkCurrencyLimits()
+    if (!isAmountValid) {
+      setAmountError(
+        `El rango de importe permtido para la moneda seleccionada es de ${currency.minAmount} a ${currency.maxAmount} `,
+      )
+    }
+
+    const response = await createOrder(
+      parseFloat(amount as string),
+      currency.blockchain,
+      notes,
+    )
+
+    if (response) {
+      navigation.dispatch(
+        StackActions.replace('OrderSummary', {
+          identifier: response.identifier,
+        }),
+      )
+    }
   }
 
   return (
     <Screen preset="auto" safeAreaEdges={['bottom']} style={$container}>
       <TextField
         value={amount}
-        onChangeText={(value) => setAmount(value)}
+        onChangeText={(value) => {
+          setAmountError('')
+          setAmount(value)
+        }}
         containerStyle={$textField}
         autoCapitalize="none"
         autoCorrect={false}
         keyboardType="numeric"
         label={'Importe a pagar'}
         placeholder={'Añade importe a pagar'}
-        // helper={error}
-        // status={error ? "error" : undefined}
+        helper={amountError}
+        status={amountError ? 'error' : undefined}
       />
 
       <Dropdown
-        items={items}
         value={currency}
+        containerStyle={$textField}
+        label="Seleccionar moneda"
+        searchModalTitle="Seleccionar moneda"
+        searchPlaceholder="Buscar"
+        items={data}
         onValueChange={setCurrency}
-        label={'Seleccionar moneda'}
-        placeholder={'Selecciona una moneda'}
-        searchPlaceholder={'Buscar'}
-        dropdownWrapperStyle={$textField}
-        disabled={isFetchingCurrencies}
+        disabled={!isFetchingCurrencies}
       />
 
       <TextField
@@ -71,16 +102,15 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
         autoCorrect={false}
         label={'Concepto'}
         placeholder={'Añade descripción del pago'}
-        // helper={error}
-        // status={error ? "error" : undefined}
-        // onSubmitEditing={() => authPasswordInput.current?.focus()}
+        maxLength={512}
       />
 
       <Button
-        onPress={onSuccessAction}
-        onLongPress={onSuccessAction}
+        onPress={create}
+        onLongPress={create}
         text={'Continuar'}
         disabled={!amount || !currency || !notes}
+        isLoading={isLoading}
       />
     </Screen>
   )
