@@ -40,15 +40,16 @@ const AppStack = () => {
       }}
     >
       <Stack.Screen
+          name="OrderSummary"
+          options={{ title: 'Pedido' }}
+          component={Screens.OrderSummaryScreen}
+      />
+      <Stack.Screen
         name="CreatePayment"
         options={{ title: 'Crear Pago' }}
         component={Screens.CreatePaymentScreen}
       />
-      <Stack.Screen
-        name="OrderSummary"
-        options={{ title: 'Resumen del pedido' }}
-        component={Screens.OrderSummaryScreen}
-      />
+
     </Stack.Navigator>
   )
 }
