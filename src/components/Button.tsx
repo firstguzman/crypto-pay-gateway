@@ -61,7 +61,7 @@ export function Button(props: ButtonProps) {
     <TouchableOpacity
       style={$viewStyle}
       accessibilityRole="button"
-      disabled
+      disabled={disabled}
       {...rest}
     >
       {isLoading ? (
@@ -80,7 +80,6 @@ export function Button(props: ButtonProps) {
 }
 
 const $baseViewStyle: ViewStyle = {
-  minHeight: 56,
   borderRadius: 6,
   justifyContent: 'center',
   alignItems: 'center',
