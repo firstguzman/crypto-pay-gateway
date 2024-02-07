@@ -58,10 +58,8 @@ export function Dropdown(props: DropdownProps) {
     searchModalTitle,
     searchPlaceholder,
     items,
-
-    disabled,
-
     onValueChange,
+    disabled,
   } = props
   const [open, setOpen] = useState<boolean>(false)
   const [search, setSearch] = useState<string>('')
@@ -92,6 +90,7 @@ export function Dropdown(props: DropdownProps) {
           />
         )}
         onPress={() => setOpen(true)}
+        editable={disabled}
       />
       <Modal visible={open} animationType="slide">
         <Screen
