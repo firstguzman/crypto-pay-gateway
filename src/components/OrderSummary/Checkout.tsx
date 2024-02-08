@@ -13,11 +13,13 @@ export interface CheckoutProps {
   cryptoFormatted: string
   address: string
   expiredDate: string
-  tag?: string
+  tag: string
 }
 
 export const Checkout: FC<CheckoutProps> = (props) => {
   const [qrSize, setQrSize] = useState<number>()
+  console.log('tag', props.tag)
+
   return (
     <Screen
       preset="auto"
@@ -69,7 +71,7 @@ export const Checkout: FC<CheckoutProps> = (props) => {
             weight="semiBold"
             style={{ textAlign: 'center' }}
           >
-            {`Etiqueta de destino: 25571 64061`}
+            {`Etiqueta de destino: ${props.tag}`}
           </Text>
           <Icon icon="copy" />
         </View>

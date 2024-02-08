@@ -73,6 +73,7 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
             cryptoFormatted={`${order?.cryptoAmount} ${order?.currencyId}`}
             address={order?.address || ''}
             expiredDate={order?.expiredTime || ''}
+            tag={order?.tagMemo || ''}
           />
         )
     }

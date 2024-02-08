@@ -57,4 +57,5 @@ export interface Order {
   notes: string
   status: Status
   creationDate: string
+  tagMemo: string
 }

@@ -16,6 +16,7 @@ function parseOrderInformationAPI(orderInfo: OrderInformationAPI): Order {
     notes: orderInfo.notes,
     status: orderInfo.status,
     creationDate: orderInfo.created_at,
+    tagMemo: orderInfo.tag_memo,
   }
 }
 
