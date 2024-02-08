@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react'
+import React, { FC, useEffect, useMemo } from 'react'
 import {
   ActivityIndicator,
   TextStyle,
@@ -9,6 +9,8 @@ import { TabBar, TabView } from 'react-native-tab-view'
 import { Screen } from '../components'
 import { Checkout, PaymentOverview } from '../components/OrderSummary'
 import { useGetOrderInfo } from '../hooks/orders.ts/useGetOrderInfo'
+
+import { useGetUpdatesOfOrderInformation } from '../hooks/orders.ts/useGetUpdatesOfOrderInformation'
 import { AppStackScreenProps } from '../navigators'
 import { colors, spacing, typography } from '../theme'
 
@@ -44,6 +46,15 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
     { key: 'overview', title: 'Resumen del pedido' },
     { key: 'checkout', title: 'Realiza el pago' },
   ])
+
+  const { messageReceived } = useGetUpdatesOfOrderInformation(
+    [order],
+    order?.identifier,
+  )
+
+  useEffect(() => {
+    console.log('messageReceived', messageReceived)
+  }, [messageReceived])
 
   const renderScene = ({
     route,
