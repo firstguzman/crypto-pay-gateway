@@ -4,13 +4,15 @@ import { TextStyle, View, ViewStyle } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { navigationRef } from '../../navigators'
 import { colors, spacing } from '../../theme'
+import { copyToClipboard } from '../../utils/copyToClipboard'
 import { Icon } from '../Icon'
 import { Screen } from '../Screen'
 import { Text } from '../Text'
 import CountdownTimer from './CountdownTimer'
 
 export interface CheckoutProps {
-  cryptoFormatted: string
+  cryptoAmount: string
+  currencyId: string
   address: string
   expiredDate: string
   tag: string
@@ -18,7 +20,6 @@ export interface CheckoutProps {
 
 export const Checkout: FC<CheckoutProps> = (props) => {
   const [qrSize, setQrSize] = useState<number>()
-  console.log('tag', props.tag)
 
   return (
     <Screen
@@ -51,17 +52,20 @@ export const Checkout: FC<CheckoutProps> = (props) => {
           <Text preset="h4" weight="semiBold">
             Enviar{' '}
             <Text preset="h4" weight="bold" style={$nestedText}>
-              {props.cryptoFormatted}
+              {`${props.cryptoAmount} ${props.currencyId}`}
             </Text>
           </Text>
-          <Icon icon="copy" />
+          <Icon
+            icon="copy"
+            onPress={() => copyToClipboard(props.cryptoAmount)}
+          />
         </View>
 
         <View style={$row}>
           <Text preset="body" style={$nestedText}>
             {props.address}
           </Text>
-          <Icon icon="copy" />
+          <Icon icon="copy" onPress={() => copyToClipboard(props.address)} />
         </View>
 
         <View style={$row}>
@@ -73,7 +77,7 @@ export const Checkout: FC<CheckoutProps> = (props) => {
           >
             {`Etiqueta de destino: ${props.tag}`}
           </Text>
-          <Icon icon="copy" />
+          <Icon icon="copy" onPress={() => copyToClipboard(props.tag)} />
         </View>
       </View>
     </Screen>

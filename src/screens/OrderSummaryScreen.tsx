@@ -37,8 +37,6 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
   const identifier = useMemo(() => route.params.identifier, [route])
   const { data: order, isLoading } = useGetOrderInfo(identifier)
 
-  console.log('order', order?.status)
-
   const layout = useWindowDimensions()
 
   const [index, setIndex] = React.useState(0)
@@ -70,7 +68,8 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
           <LoadingPlaceholder />
         ) : (
           <Checkout
-            cryptoFormatted={`${order?.cryptoAmount} ${order?.currencyId}`}
+            cryptoAmount={order?.cryptoAmount.toString() || ''}
+            currencyId={order?.currencyId || ''}
             address={order?.address || ''}
             expiredDate={order?.expiredTime || ''}
             tag={order?.tagMemo || ''}
