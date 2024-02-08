@@ -34,7 +34,7 @@ export interface Transaction {
 
 export interface OrderInformationAPI {
   identifier: string
-  reference: string
+  reference: string | null
   created_at: string
   edited_at: string
   status: Status
@@ -47,20 +47,20 @@ export interface OrderInformationAPI {
   merchant_device: string
   address: string
   tag_memo: string
-  url_ko: string
-  url_ok: string
-  url_standby: string
+  url_ko: string | null
+  url_ok: string | null
+  url_standby: string | null
   expired_time: string
-  good_fee: true
+  good_fee: boolean
   notes: string
-  rbf: true
-  safe: true
+  rbf: boolean
+  safe: boolean
   fiat: Fiat
   language: string
   percentage: number
   received_amount: number
   balance_based: string
-  internal_data: string
+  internal_data: string | null
   transactions: Transaction[]
 }
 
