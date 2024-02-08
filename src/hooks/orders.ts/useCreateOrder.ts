@@ -12,6 +12,7 @@ export function useCreateOrder() {
   ) => {
     try {
       setIsLoading(true)
+      setError('')
       const orderResult = await postOrder({
         expected_output_amount: amount,
         input_currency: currency,

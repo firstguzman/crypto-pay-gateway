@@ -37,6 +37,7 @@ interface OrderSummaryScreenProps extends AppStackScreenProps<'OrderSummary'> {}
 
 export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
   const identifier = useMemo(() => route.params.identifier, [route])
+  const paymentUri = useMemo(() => route.params.paymentUri, [route])
   const { data: order, isLoading } = useGetOrderInfo(identifier)
 
   const layout = useWindowDimensions()
@@ -79,6 +80,7 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
           <LoadingPlaceholder />
         ) : (
           <Checkout
+            paymentUri={paymentUri}
             cryptoAmount={order?.cryptoAmount.toString() || ''}
             currencyId={order?.currencyId || ''}
             address={order?.address || ''}

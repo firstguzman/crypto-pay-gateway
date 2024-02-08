@@ -17,7 +17,7 @@ import { navigationRef, useBackButtonHandler } from './navigationUtilities'
 
 export type AppStackParamList = {
   CreatePayment: undefined
-  OrderSummary: { identifier: string }
+  OrderSummary: { identifier: string; paymentUri: string }
 }
 
 // /**

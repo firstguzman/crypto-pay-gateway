@@ -44,10 +44,12 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
   const create = async () => {
     if (currency === undefined) return
     const isAmountValid = checkCurrencyLimits()
+
     if (!isAmountValid) {
       setAmountError(
         `El rango de importe permtido para la moneda seleccionada es de ${currency.minAmount} a ${currency.maxAmount} `,
       )
+      return
     }
 
     const response = await createOrder(
@@ -60,6 +62,7 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
       navigation.dispatch(
         StackActions.replace('OrderSummary', {
           identifier: response.identifier,
+          paymentUri: response.payment_uri,
         }),
       )
     }

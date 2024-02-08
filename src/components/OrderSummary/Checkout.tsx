@@ -11,6 +11,7 @@ import { Text } from '../Text'
 import CountdownTimer from './CountdownTimer'
 
 export interface CheckoutProps {
+  paymentUri: string
   cryptoAmount: string
   currencyId: string
   address: string
@@ -44,7 +45,7 @@ export const Checkout: FC<CheckoutProps> = (props) => {
           setQrSize(width - spacing.lg * 2)
         }}
       >
-        <QRCode size={qrSize} value="http://awesome.link.qr" />
+        <QRCode size={qrSize} value={props.paymentUri} />
       </View>
 
       <View style={$informationContainer}>
@@ -68,17 +69,19 @@ export const Checkout: FC<CheckoutProps> = (props) => {
           <Icon icon="copy" onPress={() => copyToClipboard(props.address)} />
         </View>
 
-        <View style={$row}>
-          <Icon icon="warning" />
-          <Text
-            preset="small"
-            weight="semiBold"
-            style={{ textAlign: 'center' }}
-          >
-            {`Etiqueta de destino: ${props.tag}`}
-          </Text>
-          <Icon icon="copy" onPress={() => copyToClipboard(props.tag)} />
-        </View>
+        {!!props.tag && (
+          <View style={$row}>
+            <Icon icon="warning" />
+            <Text
+              preset="small"
+              weight="semiBold"
+              style={{ textAlign: 'center' }}
+            >
+              {`Etiqueta de destino: ${props.tag}`}
+            </Text>
+            <Icon icon="copy" onPress={() => copyToClipboard(props.tag)} />
+          </View>
+        )}
       </View>
     </Screen>
   )
