@@ -1,8 +1,7 @@
-import { StackActions } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import React, { FC, useState } from 'react'
 import { TextStyle, View, ViewStyle } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
-import { navigationRef } from '../../navigators'
 import { colors, spacing } from '../../theme'
 import { copyToClipboard } from '../../utils/copyToClipboard'
 import { Icon } from '../Icon'
@@ -21,6 +20,7 @@ export interface CheckoutProps {
 
 export const Checkout: FC<CheckoutProps> = (props) => {
   const [qrSize, setQrSize] = useState<number>()
+  const navigation = useNavigation()
 
   return (
     <Screen
@@ -33,7 +33,7 @@ export const Checkout: FC<CheckoutProps> = (props) => {
         <CountdownTimer
           endDate={props.expiredDate}
           onCountDownEnd={() =>
-            navigationRef.dispatch(StackActions.replace('CreatePayment'))
+            navigation.dispatch(StackActions.replace('CreatePayment'))
           }
         />
       </View>
