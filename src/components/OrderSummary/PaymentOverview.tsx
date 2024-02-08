@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import { View, ViewStyle } from 'react-native'
 import { colors, spacing } from '../../theme'
+import { formatDate } from '../../utils/formatDate'
 import { Icon } from '../Icon'
 import { Screen } from '../Screen'
 import { Text } from '../Text'
@@ -37,7 +38,15 @@ const Separator = () => {
   )
 }
 
-export const PaymentOverview: FC<any> = () => {
+export interface PaymentOverviewProps {
+  fiatFormatted: string
+  currencyId: string
+  merchant: string
+  creationDate: string
+  notes: string
+}
+
+export const PaymentOverview: FC<PaymentOverviewProps> = (props) => {
   return (
     <Screen
       preset="fixed"
@@ -45,14 +54,14 @@ export const PaymentOverview: FC<any> = () => {
       contentContainerStyle={$container}
     >
       <Item label="Importe:">
-        <Text preset={'h5'}>56,06 EUR</Text>
+        <Text preset={'h5'}>{props.fiatFormatted}</Text>
       </Item>
 
       <Separator />
 
       <Item label="Moneda seleccionada:">
         <Text preset={'h6'} weight="bold">
-          XRP
+          {props.currencyId}
         </Text>
       </Item>
 
@@ -68,13 +77,13 @@ export const PaymentOverview: FC<any> = () => {
           }}
         >
           <Icon icon="verify" />
-          <Text preset={'h6'}>Comercio de pruebas de Semega</Text>
+          <Text preset={'h6'}>{props.merchant}</Text>
         </View>
       </Item>
 
       <Item label="Fecha:">
         <Text preset={'h6'} style={{ maxWidth: '50%' }}>
-          21/01/2022 08:52
+          {formatDate(props.creationDate)}
         </Text>
       </Item>
 
@@ -82,7 +91,7 @@ export const PaymentOverview: FC<any> = () => {
 
       <Item label="Concepto:">
         <Text preset={'h6'} style={{ maxWidth: '50%' }}>
-          Viajes & Ocio
+          {props.notes}
         </Text>
       </Item>
     </Screen>

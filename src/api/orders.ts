@@ -1,38 +1,6 @@
 import Config from '../config'
 import { http } from '../http'
-
-enum Fiat {
-  EUR = 'EUR',
-  USD = 'USD',
-  GBP = 'GBP',
-  ARS = 'ARS',
-  AUD = 'AUD',
-  BGN = 'BGN',
-  BOB = 'BOB',
-  BRL = 'BRL',
-  CAD = 'CAD',
-  CHF = 'CHF',
-  CLP = 'CLP',
-  COP = 'COP',
-  DKK = 'DKK',
-  DOP = 'DOP',
-  GEL = 'GEL',
-  HUF = 'HUF',
-  ISK = 'ISK',
-  JPY = 'JPY',
-  KRW = 'KRW',
-  MXN = 'MXN',
-  NOK = 'NOK',
-  NZD = 'NZD',
-  PEN = 'PEN',
-  PLN = 'PLN',
-  PYG = 'PYG',
-  RON = 'RON',
-  SEK = 'SEK',
-  SGD = 'SGD',
-  SVC = 'SVC',
-  UYU = 'UYU',
-}
+import { Fiat, Status } from '../types/orders'
 
 export interface CreateOrderAPI {
   expected_output_amount: number
@@ -40,7 +8,7 @@ export interface CreateOrderAPI {
   notes: string
 }
 
-export interface OrderSuccessResponse {
+export interface OrderSuccessAPI {
   identifier: string
   reference: string
   payment_uri: string
@@ -53,6 +21,47 @@ export interface OrderSuccessResponse {
   notes: string
   fiat: Fiat
   language: string
+}
+
+export interface Transaction {
+  confirmed: boolean
+  currency: string
+  amount: number
+  tx_hash: string
+  block: number
+  created_at: string
+}
+
+export interface OrderInformationAPI {
+  identifier: string
+  reference: string
+  created_at: string
+  edited_at: string
+  status: Status
+  fiat_amount: number
+  crypto_amount: number
+  unconfirmed_amount: number
+  confirmed_amount: number
+  currency_id: string
+  merchant_device_id: number
+  merchant_device: string
+  address: string
+  tag_memo: string
+  url_ko: string
+  url_ok: string
+  url_standby: string
+  expired_time: string
+  good_fee: true
+  notes: string
+  rbf: true
+  safe: true
+  fiat: Fiat
+  language: string
+  percentage: number
+  received_amount: number
+  balance_based: string
+  internal_data: string
+  transactions: Transaction[]
 }
 
 export function handleErrorMessage(code: number) {
@@ -69,7 +78,19 @@ export async function postOrder(payload: CreateOrderAPI) {
   try {
     const url = `${Config.API_URL}orders/`
 
-    const result = await http.post<OrderSuccessResponse>(url, payload)
+    const result = await http.post<OrderSuccessAPI>(url, payload)
+
+    return result
+  } catch (error: any) {
+    throw handleErrorMessage(error.code as number)
+  }
+}
+
+export async function getOrderInfo(identifier: string) {
+  try {
+    const url = `${Config.API_URL}orders/info/${identifier}`
+
+    const result = await http.get<OrderInformationAPI[]>(url)
 
     return result
   } catch (error: any) {

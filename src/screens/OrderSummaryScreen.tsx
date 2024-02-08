@@ -1,36 +1,89 @@
-import React, { FC } from 'react'
-import { ViewStyle } from 'react-native'
+import React, { FC, useMemo } from 'react'
+import {
+  ActivityIndicator,
+  TextStyle,
+  ViewStyle,
+  useWindowDimensions,
+} from 'react-native'
+import { TabBar, TabView } from 'react-native-tab-view'
+import { Screen } from '../components'
+import { Checkout, PaymentOverview } from '../components/OrderSummary'
+import { useGetOrderInfo } from '../hooks/orders.ts/useGetOrderInfo'
+import { AppStackScreenProps } from '../navigators'
 import { colors, spacing, typography } from '../theme'
 
-import { useWindowDimensions } from 'react-native'
-import { SceneMap, TabBar, TabView } from 'react-native-tab-view'
-import { Checkout, PaymentOverview } from '../components/OrderSummary'
+const LoadingPlaceholder = () => {
+  return (
+    <Screen
+      preset="fixed"
+      safeAreaEdges={['bottom']}
+      contentContainerStyle={$container}
+    >
+      <ActivityIndicator size={'large'} color={colors.backgroundPrimary} />
+    </Screen>
+  )
+}
 
-const renderScene = SceneMap({
-  first: PaymentOverview,
-  second: Checkout,
-})
+const $container: ViewStyle = {
+  flex: 1,
+  paddingHorizontal: spacing.md,
+  backgroundColor: colors.cards,
+  justifyContent: 'center',
+}
 
-export const OrderSummaryScreen: FC<any> = () => {
+interface OrderSummaryScreenProps extends AppStackScreenProps<'OrderSummary'> {}
+
+export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
+  const identifier = useMemo(() => route.params.identifier, [route])
+  const { data: order, isLoading } = useGetOrderInfo(identifier)
+
+  console.log('order', order?.status)
+
   const layout = useWindowDimensions()
 
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
-    { key: 'first', title: 'Resumen del pedido' },
-    { key: 'second', title: 'Realiza el pago' },
+    { key: 'overview', title: 'Resumen del pedido' },
+    { key: 'checkout', title: 'Realiza el pago' },
   ])
+
+  const renderScene = ({
+    route,
+  }: {
+    route: { key: string; title: string }
+  }) => {
+    switch (route.key) {
+      case 'overview':
+        return isLoading ? (
+          <LoadingPlaceholder />
+        ) : (
+          <PaymentOverview
+            fiatFormatted={`${order?.fiatAmount} ${order?.fiat}`}
+            currencyId={order?.currencyId || ''}
+            merchant={order?.merchantDevice || ''}
+            creationDate={order?.creationDate || ''}
+            notes={order?.notes || ''}
+          />
+        )
+      case 'checkout':
+        return isLoading ? (
+          <LoadingPlaceholder />
+        ) : (
+          <Checkout
+            cryptoFormatted={`${order?.cryptoAmount} ${order?.currencyId}`}
+            address={order?.address || ''}
+            expiredDate={order?.expiredTime || ''}
+          />
+        )
+    }
+  }
 
   const renderTabBar = (props: any) => (
     <TabBar
       {...props}
       indicatorStyle={{ backgroundColor: colors.backgroundPrimary }}
       style={{ backgroundColor: colors.background }}
-      labelStyle={{
-        color: colors.text,
-        fontFamily: typography.primary.normal,
-        textTransform: 'none',
-        fontSize: 16,
-      }}
+      labelStyle={$labelStyle}
     />
   )
 
@@ -45,8 +98,9 @@ export const OrderSummaryScreen: FC<any> = () => {
   )
 }
 
-const $container: ViewStyle = {
-  flex: 1,
-  paddingHorizontal: spacing.md,
-  paddingTop: spacing.lg,
+const $labelStyle: TextStyle = {
+  color: colors.text,
+  fontFamily: typography.primary.normal,
+  textTransform: 'none',
+  fontSize: 16,
 }

@@ -1,12 +1,22 @@
+import { StackActions } from '@react-navigation/native'
 import React, { FC, useState } from 'react'
-import { View, ViewStyle } from 'react-native'
+import { TextStyle, View, ViewStyle } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
+import { navigationRef } from '../../navigators'
 import { colors, spacing } from '../../theme'
 import { Icon } from '../Icon'
 import { Screen } from '../Screen'
 import { Text } from '../Text'
+import CountdownTimer from './CountdownTimer'
 
-export const Checkout: FC<any> = () => {
+export interface CheckoutProps {
+  cryptoFormatted: string
+  address: string
+  expiredDate: string
+  tag?: string
+}
+
+export const Checkout: FC<CheckoutProps> = (props) => {
   const [qrSize, setQrSize] = useState<number>()
   return (
     <Screen
@@ -14,40 +24,18 @@ export const Checkout: FC<any> = () => {
       safeAreaEdges={['bottom']}
       contentContainerStyle={$container}
     >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: spacing.xl,
-          justifyContent: 'center',
-          gap: spacing.xxs,
-        }}
-      >
+      <View style={$countDownContainer}>
         <Icon icon="timer" />
-        <Text preset="small" weight="semiBold">
-          05:08
-        </Text>
+        <CountdownTimer
+          endDate={props.expiredDate}
+          onCountDownEnd={() =>
+            navigationRef.dispatch(StackActions.replace('CreatePayment'))
+          }
+        />
       </View>
 
       <View
-        style={{
-          borderRadius: 10,
-          backgroundColor: colors.background,
-          aspectRatio: 1,
-          alignItems: 'center',
-          alignSelf: 'center',
-          marginBottom: spacing.xl,
-          justifyContent: 'center',
-          padding: spacing.lg,
-          shadowColor: '#000000',
-          shadowOffset: {
-            width: 0,
-            height: 1,
-          },
-          shadowOpacity: 0.16,
-          shadowRadius: 1.51,
-          elevation: 2,
-        }}
+        style={$qrWrapper}
         onLayout={(event) => {
           const { width } = event.nativeEvent.layout
           setQrSize(width - spacing.lg * 2)
@@ -56,58 +44,32 @@ export const Checkout: FC<any> = () => {
         <QRCode size={qrSize} value="http://awesome.link.qr" />
       </View>
 
-      <View
-        style={{
-          alignItems: 'center',
-          marginBottom: spacing.xl,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            marginBottom: spacing.sm,
-            alignItems: 'center',
-            gap: spacing.xs,
-          }}
-        >
+      <View style={$informationContainer}>
+        <View style={$row}>
           <Text preset="h4" weight="semiBold">
             Enviar{' '}
-            <Text preset="h4" weight="bold">
-              108,02 XRP
+            <Text preset="h4" weight="bold" style={$nestedText}>
+              {props.cryptoFormatted}
             </Text>
           </Text>
           <Icon icon="copy" />
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            marginBottom: spacing.sm,
-            alignItems: 'center',
-            gap: spacing.xs,
-          }}
-        >
-          <Text preset="body" style={{ textAlign: 'center', maxWidth: '80%' }}>
-            Xp4Lw2PtQgB7RmedTak143LrXp4Lw2PtQgB7RmedEV731CdTak143LrXp4L
+        <View style={$row}>
+          <Text preset="body" style={$nestedText}>
+            {props.address}
           </Text>
           <Icon icon="copy" />
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            marginBottom: spacing.sm,
-            alignItems: 'center',
-            gap: spacing.xs,
-          }}
-        >
+        <View style={$row}>
           <Icon icon="warning" />
           <Text
             preset="small"
             weight="semiBold"
             style={{ textAlign: 'center' }}
           >
-            Etiqueta de destino: 25571 64061
+            {`Etiqueta de destino: 25571 64061`}
           </Text>
           <Icon icon="copy" />
         </View>
@@ -122,3 +84,44 @@ const $container: ViewStyle = {
   backgroundColor: colors.cards,
   paddingTop: spacing.lg,
 }
+
+const $countDownContainer: ViewStyle = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: spacing.xl,
+  justifyContent: 'center',
+  gap: spacing.xxs,
+}
+
+const $qrWrapper: ViewStyle = {
+  borderRadius: 10,
+  backgroundColor: colors.background,
+  aspectRatio: 1,
+  alignItems: 'center',
+  alignSelf: 'center',
+  marginBottom: spacing.xl,
+  justifyContent: 'center',
+  padding: spacing.lg,
+  shadowColor: '#000000',
+  shadowOffset: {
+    width: 0,
+    height: 1,
+  },
+  shadowOpacity: 0.16,
+  shadowRadius: 1.51,
+  elevation: 2,
+}
+
+const $informationContainer: ViewStyle = {
+  alignItems: 'center',
+  marginBottom: spacing.xl,
+}
+
+const $row: ViewStyle = {
+  flexDirection: 'row',
+  marginBottom: spacing.sm,
+  alignItems: 'center',
+  gap: spacing.xs,
+}
+
+const $nestedText: TextStyle = { textAlign: 'center', maxWidth: '80%' }
