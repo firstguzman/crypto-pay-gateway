@@ -4,6 +4,7 @@ export interface GeneralApiProblem {
   kind: string
   scope: string
   code?: number
+  message?: unknown
 }
 
 export function getGeneralApiProblem(error: AxiosError): GeneralApiProblem {
@@ -22,6 +23,13 @@ export function getGeneralApiProblem(error: AxiosError): GeneralApiProblem {
           kind: 'invalid-data',
           scope: 'Axios - ResponseError',
           code: error.response.status,
+        }
+      case 429:
+        return {
+          kind: 'too-many-requests',
+          scope: 'Axios - ResponseError',
+          code: error.response.status,
+          message: error.response.data,
         }
       case 500:
         return {

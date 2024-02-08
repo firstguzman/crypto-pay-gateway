@@ -64,11 +64,13 @@ export interface OrderInformationAPI {
   transactions: Transaction[]
 }
 
-export function handleErrorMessage(code: number) {
+export function handleErrorMessage(code: number, message?: string) {
   if (code === 403) {
     return 'The authentication credentials where not provided'
   } else if (code === 404) {
     return 'Invalid currency or minimum amount not reached. Url redirection or symbol missed. DNI Image is missed.'
+  } else if (code === 429) {
+    return message
   } else {
     return 'Some internal error happened. Try again or, if the problem persists, contact us.'
   }
@@ -82,7 +84,7 @@ export async function postOrder(payload: CreateOrderAPI) {
 
     return result
   } catch (error: any) {
-    throw handleErrorMessage(error.code as number)
+    throw handleErrorMessage(error.code as number, error.message.detail)
   }
 }
 
@@ -94,6 +96,6 @@ export async function getOrderInfo(identifier: string) {
 
     return result
   } catch (error: any) {
-    throw handleErrorMessage(error.code as number)
+    throw handleErrorMessage(error.code as number, error.message.detail)
   }
 }

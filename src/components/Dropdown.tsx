@@ -43,11 +43,18 @@ export interface DropdownProps {
    * Function to be executed to change selected value.
    */
   onValueChange: (callback: SetStateAction<any>) => void
-
   /**
    * State to input disable or not
    */
   disabled?: boolean
+  /**
+   * To change style when error is presented
+   */
+  error?: boolean
+  /**
+   * The helper text to display.
+   */
+  helper?: TextProps['text']
 }
 
 export function Dropdown(props: DropdownProps) {
@@ -60,6 +67,8 @@ export function Dropdown(props: DropdownProps) {
     items,
     onValueChange,
     disabled,
+    error,
+    helper,
   } = props
   const [open, setOpen] = useState<boolean>(false)
   const [search, setSearch] = useState<string>('')
@@ -91,6 +100,8 @@ export function Dropdown(props: DropdownProps) {
         )}
         onPress={() => setOpen(true)}
         editable={disabled}
+        status={error ? 'error' : undefined}
+        helper={helper}
       />
       <Modal visible={open} animationType="slide">
         <Screen

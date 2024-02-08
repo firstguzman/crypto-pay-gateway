@@ -21,7 +21,11 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
 
   const [amountError, setAmountError] = useState<string>('')
 
-  const { data, isLoading: isFetchingCurrencies } = useGetCurrenciesList()
+  const {
+    data,
+    isLoading: isFetchingCurrencies,
+    error: currenciesError,
+  } = useGetCurrenciesList()
   const { createOrder, isLoading, error } = useCreateOrder()
 
   useEffect(() => {
@@ -95,6 +99,8 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
         items={data}
         onValueChange={setCurrency}
         disabled={!isFetchingCurrencies}
+        helper={currenciesError}
+        error={Boolean(currenciesError.length)}
       />
 
       <TextField
