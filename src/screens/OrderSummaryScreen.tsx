@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import {
   ActivityIndicator,
   TextStyle,
@@ -6,13 +6,15 @@ import {
   useWindowDimensions,
 } from 'react-native'
 import { TabBar, TabView } from 'react-native-tab-view'
-import { Screen } from '../components'
+import { Modal, Screen } from '../components'
 import { Checkout, PaymentOverview } from '../components/OrderSummary'
 import { useGetOrderInfo } from '../hooks/orders.ts/useGetOrderInfo'
 
+import { useNavigation } from '@react-navigation/native'
 import { useGetUpdatesOfOrderInformation } from '../hooks/orders.ts/useGetUpdatesOfOrderInformation'
 import { AppStackScreenProps } from '../navigators'
 import { colors, spacing, typography } from '../theme'
+import { Order, Status } from '../types/orders'
 
 const LoadingPlaceholder = () => {
   return (
@@ -41,20 +43,43 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
   const { data: order, isLoading } = useGetOrderInfo(identifier)
 
   const layout = useWindowDimensions()
+  const navigation = useNavigation()
 
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
     { key: 'overview', title: 'Resumen del pedido' },
     { key: 'checkout', title: 'Realiza el pago' },
   ])
+  const [modalState, setModalState] = useState<{
+    open: boolean
+    preset: 'success' | 'error'
+  }>({ open: false, preset: 'success' })
 
   const { messageReceived } = useGetUpdatesOfOrderInformation(
     [order],
     order?.identifier,
   )
 
+  const handleMessageReceived = (message: Order) => {
+    if (message?.status === Status.EX || message?.status === Status.OC) {
+      setModalState({ open: true, preset: 'error' })
+      return
+    }
+    if (message?.status === Status.CO || message?.status === Status.AC) {
+      setModalState({ open: true, preset: 'success' })
+      return
+    }
+  }
+
+  const createAnotherOrder = () => {
+    setModalState({ ...modalState, open: false })
+    navigation.goBack()
+  }
+
   useEffect(() => {
-    console.log('messageReceived', messageReceived)
+    if (messageReceived !== undefined) {
+      handleMessageReceived(messageReceived)
+    }
   }, [messageReceived])
 
   const renderScene = ({
@@ -86,6 +111,7 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
             address={order?.address || ''}
             expiredDate={order?.expiredTime || ''}
             tag={order?.tagMemo || ''}
+            onTimeExpired={() => setModalState({ open: true, preset: 'error' })}
           />
         )
     }
@@ -101,13 +127,25 @@ export const OrderSummaryScreen: FC<OrderSummaryScreenProps> = ({ route }) => {
   )
 
   return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={{ width: layout.width }}
-      renderTabBar={renderTabBar}
-    />
+    <>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+        renderTabBar={renderTabBar}
+      />
+
+      <Modal
+        animationType="fade"
+        visible={modalState.open}
+        preset={modalState.preset}
+        title="Pago completado"
+        description="Lorem ipsum dolor sit amet consectetur. Laoreet blandit auctor et varius dolor elit facilisi enim. Nulla ut ut eu nunc."
+        buttonActionText="Crear nuevo pago"
+        onPress={createAnotherOrder}
+      />
+    </>
   )
 }
 

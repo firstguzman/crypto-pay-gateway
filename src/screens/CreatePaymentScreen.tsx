@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from 'react'
 import { ViewStyle } from 'react-native'
 import { Button, Dropdown, Screen, TextField } from '../components'
 
-import { StackActions } from '@react-navigation/native'
 import { useGetCurrenciesList } from '../hooks/currencies/useGetCurrenciesList'
 import { useCreateOrder } from '../hooks/orders.ts/useCreateOrder'
 import { AppStackScreenProps } from '../navigators'
@@ -63,12 +62,12 @@ export const CreatePaymentScreen: FC<CreatePaymentScreenProps> = ({
     )
 
     if (response) {
-      navigation.dispatch(
-        StackActions.replace('OrderSummary', {
-          identifier: response.identifier,
-          paymentUri: response.payment_uri,
-        }),
-      )
+      navigation.navigate('OrderSummary', {
+        identifier: response.identifier,
+        paymentUri: response.payment_uri,
+      })
+      setNotes('')
+      setAmount('')
     }
   }
 
